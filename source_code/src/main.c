@@ -15,9 +15,12 @@ int main(void) {
   setup();
 
   while (1) {
+    // usart_send(USART2, "o");
+    // usart_send(USART2, "\n");
     // gpio_toggle(GPIOC, GPIO13);
     // printf("D: %d\tI: %d\n", get_encoder_right_total_ticks(), 0);
-    // delay(100);
+    printf("%s\n", "PATO");
+    delay(100);
     // while(!gpio_get(GPIOA, GPIO4)){
     //   gpio_clear(GPIOC, GPIO13);
 
@@ -26,22 +29,22 @@ int main(void) {
     // } */
     //   gpio_set(GPIOC, GPIO13);
 
-    while (!gpio_get(GPIOA, GPIO4)) {
-      uint8_t c = spi_read(SPI1);
-      switch (command) {
-        case 0:
-          command = c;
-          break;
-        case 3:
-          if (c == 1) {
-            gpio_clear(GPIOC, GPIO13);
-          } else if (c == 2) {
-            gpio_set(GPIOC, GPIO13);
-          }
-          break;
-      }
-    }
-    command = 0;
+    // while (!gpio_get(GPIOA, GPIO4)) {
+    //   uint8_t c = spi_read(SPI1);
+    //   switch (command) {
+    //     case 0:
+    //       command = c;
+    //       break;
+    //     case 3:
+    //       if (c == 1) {
+    //         gpio_clear(GPIOC, GPIO13);
+    //       } else if (c == 2) {
+    //         gpio_set(GPIOC, GPIO13);
+    //       }
+    //       break;
+    //   }
+    // }
+    // command = 0;
     // gpio_set(GPIOC, GPIO13);
   }
   return 0;

@@ -16,8 +16,9 @@ static void setup_clock(void) {
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
 
-  rcc_periph_clock_enable(RCC_SPI1);
-  rcc_periph_clock_enable(RCC_USART2);
+  // rcc_periph_clock_enable(RCC_SPI1);
+  // rcc_periph_clock_enable(RCC_USART2);
+  rcc_periph_clock_enable(RCC_USART3);
 
   rcc_periph_clock_enable(RCC_TIM1);
   rcc_periph_clock_enable(RCC_TIM2);
@@ -40,9 +41,11 @@ static void setup_systick(void) {
 static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
   nvic_set_priority(NVIC_SPI1_IRQ, 16 * 2);
-  nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
+  // nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
+  nvic_set_priority(NVIC_USART3_IRQ, 16 * 3);
 
-  nvic_enable_irq(NVIC_USART2_IRQ);
+  // nvic_enable_irq(NVIC_USART2_IRQ);
+  nvic_enable_irq(NVIC_USART3_IRQ);
   // nvic_enable_irq(NVIC_SPI1_IRQ);
 }
 
@@ -51,10 +54,10 @@ static void setup_gpio(void) {
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
   // Salida PWM para los motores
-  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
-  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO3 | GPIO5);
+  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
+  // gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO3 | GPIO5);
 
   // Entradas Encoders
   // gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6 | GPIO7);
@@ -63,10 +66,18 @@ static void setup_gpio(void) {
   // gpio_set_af(GPIOA, GPIO_AF2, GPIO6 | GPIO7);
 
   /* SPI */
-  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO4 | GPIO5 | GPIO7);
-  gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6); // INPUT? OUTPUT 50MHZ?
+  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO4 | GPIO5 | GPIO7);
+  // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6); // INPUT? OUTPUT 50MHZ?
 
   // USART2
+
+  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART2_TX);
+  // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+  //               GPIO_USART2_RX);
+  // gpio_set(GPIOA, GPIO_USART2_RX);
+
+  // USART3
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                 GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART3_TX);
   gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
@@ -84,6 +95,57 @@ static void setup_usart(void) {
   // USART_CR1(USART3) |= USART_CR1_RXNEIE;
   // usart_enable_tx_interrupt(USART3);
   usart_enable(USART3);
+}
+
+static void setup_usart_foc(void) {
+  usart_set_baudrate(USART3, 115200);
+  usart_set_databits(USART3, 8);
+  usart_set_stopbits(USART3, USART_STOPBITS_1);
+  usart_set_parity(USART3, USART_PARITY_NONE);
+  usart_set_flow_control(USART3, USART_FLOWCONTROL_NONE);
+  usart_set_mode(USART3, USART_MODE_TX_RX);
+  // USART_CR1(USART3) |= USART_CR1_RXNEIE;
+  usart_enable_rx_interrupt(USART3);
+  usart_enable(USART3);
+}
+
+void usart3_isr(void) {
+  static uint8_t data = 'A';
+
+  /* Check if we were called because of RXNE. */
+  if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) &&
+      ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
+
+    /* Indicate that we got data. */
+
+    /* Retrieve the data from the peripheral. */
+    data = usart_recv(USART3);
+    if (data != '\n' && data != '\r') {
+      if (data == 'a') {
+        gpio_clear(GPIOC, GPIO13);
+      } else {
+        gpio_set(GPIOC, GPIO13);
+      }
+    }
+
+    /* Enable transmit interrupt so it sends back the data. */
+    // USART_CR1(USART3) |= USART_CR1_TXEIE;
+     usart_enable_tx_interrupt(USART3);
+  }
+
+  /* Check if we were called because of TXE. */
+  if (((USART_CR1(USART3) & USART_CR1_TXEIE) != 0) &&
+      ((USART_SR(USART3) & USART_SR_TXE) != 0)) {
+
+    /* Indicate that we are sending out data. */
+    // gpio_toggle(GPIOC, GPIO15);
+
+    /* Put data into the transmit register. */
+    usart_send(USART3, data);
+
+    /* Disable the TXE interrupt as we don't need it anymore. */
+    usart_disable_tx_interrupt(USART3);
+  }
 }
 
 static void setup_quadrature_encoders(void) {
@@ -131,10 +193,11 @@ static void setup_spi(void) {
 void setup(void) {
   setup_clock();
   setup_gpio();
-  setup_usart();
+  // setup_usart();
+  setup_usart_foc();
   setup_quadrature_encoders();
 
   setup_timer_priorities();
-  setup_spi();
+  // setup_spi();
   setup_systick();
 }
