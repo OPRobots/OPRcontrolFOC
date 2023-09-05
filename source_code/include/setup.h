@@ -12,7 +12,12 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "config.h"
+#include "usart.h"
 
 void setup(void);
 

@@ -92,59 +92,27 @@ static void setup_usart(void) {
   usart_set_parity(USART3, USART_PARITY_NONE);
   usart_set_flow_control(USART3, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART3, USART_MODE_TX_RX);
-  // USART_CR1(USART3) |= USART_CR1_RXNEIE;
-  // usart_enable_tx_interrupt(USART3);
-  usart_enable(USART3);
-}
-
-static void setup_usart_foc(void) {
-  usart_set_baudrate(USART3, 115200);
-  usart_set_databits(USART3, 8);
-  usart_set_stopbits(USART3, USART_STOPBITS_1);
-  usart_set_parity(USART3, USART_PARITY_NONE);
-  usart_set_flow_control(USART3, USART_FLOWCONTROL_NONE);
-  usart_set_mode(USART3, USART_MODE_TX_RX);
-  // USART_CR1(USART3) |= USART_CR1_RXNEIE;
-  usart_enable_rx_interrupt(USART3);
+  USART_CR1(USART3) |= USART_CR1_RXNEIE;
   usart_enable(USART3);
 }
 
 void usart3_isr(void) {
-  static uint8_t data = 'A';
+  static uint8_t i = 0;
+  static char command[8];
 
-  /* Check if we were called because of RXNE. */
   if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) &&
       ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
 
-    /* Indicate that we got data. */
-
-    /* Retrieve the data from the peripheral. */
-    data = usart_recv(USART3);
-    if (data != '\n' && data != '\r') {
-      if (data == 'a') {
-        gpio_clear(GPIOC, GPIO13);
-      } else {
-        gpio_set(GPIOC, GPIO13);
+    uint8_t data = usart_recv(USART3);
+    if (data != '\n') {
+      command[i++] = data;
+    } else {
+      manage_usart_command(command[0], atoi(&command[1]));
+      for (uint8_t p = 0; p < i; p++) {
+        command[p] = '\0';
       }
+      i = 0;
     }
-
-    /* Enable transmit interrupt so it sends back the data. */
-    // USART_CR1(USART3) |= USART_CR1_TXEIE;
-     usart_enable_tx_interrupt(USART3);
-  }
-
-  /* Check if we were called because of TXE. */
-  if (((USART_CR1(USART3) & USART_CR1_TXEIE) != 0) &&
-      ((USART_SR(USART3) & USART_SR_TXE) != 0)) {
-
-    /* Indicate that we are sending out data. */
-    // gpio_toggle(GPIOC, GPIO15);
-
-    /* Put data into the transmit register. */
-    usart_send(USART3, data);
-
-    /* Disable the TXE interrupt as we don't need it anymore. */
-    usart_disable_tx_interrupt(USART3);
   }
 }
 
@@ -193,8 +161,7 @@ static void setup_spi(void) {
 void setup(void) {
   setup_clock();
   setup_gpio();
-  // setup_usart();
-  setup_usart_foc();
+  setup_usart();
   setup_quadrature_encoders();
 
   setup_timer_priorities();
