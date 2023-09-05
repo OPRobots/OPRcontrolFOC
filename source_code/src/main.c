@@ -15,6 +15,8 @@ int main(void) {
   setup();
 
   while (1) {
+    printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_right_total_ticks());
+    delay(100);
     // usart_send(USART2, "o");
     // usart_send(USART2, "\n");
     // gpio_toggle(GPIOC, GPIO13);

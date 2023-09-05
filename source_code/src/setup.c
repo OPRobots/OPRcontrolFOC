@@ -15,6 +15,7 @@ static void setup_clock(void) {
   rcc_periph_clock_enable(RCC_GPIOA);
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
+  rcc_periph_clock_enable(RCC_AFIO);
 
   // rcc_periph_clock_enable(RCC_SPI1);
   // rcc_periph_clock_enable(RCC_USART2);
@@ -43,10 +44,14 @@ static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SPI1_IRQ, 16 * 2);
   // nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
   nvic_set_priority(NVIC_USART3_IRQ, 16 * 3);
+  nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 4);
+  nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 5);
 
   // nvic_enable_irq(NVIC_USART2_IRQ);
   nvic_enable_irq(NVIC_USART3_IRQ);
   // nvic_enable_irq(NVIC_SPI1_IRQ);
+  nvic_enable_irq(NVIC_EXTI3_IRQ);
+  nvic_enable_irq(NVIC_EXTI15_10_IRQ);
 }
 
 static void setup_gpio(void) {
@@ -54,16 +59,19 @@ static void setup_gpio(void) {
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
   // Salida PWM para los motores
-  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
-  // gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO3 | GPIO5);
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM2_CH1_ETR | GPIO_TIM2_CH2 | GPIO_TIM2_CH3 | GPIO_TIM1_CH1 | GPIO_TIM1_CH2 | GPIO_TIM1_CH3);
 
   // Entradas Encoders
-  // gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6 | GPIO7);
-  // gpio_set_af(GPIOB, GPIO_AF2, GPIO6 | GPIO7);
-  // gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6 | GPIO7);
-  // gpio_set_af(GPIOA, GPIO_AF2, GPIO6 | GPIO7);
+  // gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4 | GPIO5 | GPIO6 | GPIO7);
+  // gpio_set_af(GPIOB, GPIO_AF2, GPIO4 | GPIO5 | GPIO6 | GPIO7);
+  // Remap TIM3 Encoders
+  gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
+                     AFIO_MAPR_TIM3_REMAP_PARTIAL_REMAP);
+
+  // Index Encoders
+  gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3);
+  gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15);
 
   /* SPI */
   // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO4 | GPIO5 | GPIO7);
@@ -123,40 +131,58 @@ static void setup_quadrature_encoders(void) {
   timer_ic_set_input(TIM4, TIM_IC2, TIM_IC_IN_TI2);
   timer_enable_counter(TIM4);
 
+  exti_select_source(EXTI3, GPIOB);
+  exti_set_trigger(EXTI3, EXTI_TRIGGER_FALLING);
+  exti_enable_request(EXTI3);
+
   timer_set_period(TIM3, 0xFFFF);
   timer_slave_set_mode(TIM3, TIM_SMCR_SMS_EM3);
   timer_ic_set_input(TIM3, TIM_IC1, TIM_IC_IN_TI1);
   timer_ic_set_input(TIM3, TIM_IC2, TIM_IC_IN_TI2);
   timer_enable_counter(TIM3);
+
+  exti_select_source(EXTI15, GPIOA);
+  exti_set_trigger(EXTI15, EXTI_TRIGGER_FALLING);
+  exti_enable_request(EXTI15);
 }
 
-static void setup_spi(void) {
-  spi_reset(SPI1);
-  // spi_disable_crc(SPI1);
-
-  // spi_init_slave
-  uint32_t reg32 = SPI_CR1(SPI1);
-
-  /* Reset all bits omitting SPE, CRCEN and CRCNEXT bits. */
-  reg32 &= SPI_CR1_SPE | SPI_CR1_CRCEN | SPI_CR1_CRCNEXT;
-
-  reg32 |= (0 << 2); /* Configure SPI as slave. */
-
-  reg32 |= SPI_CR1_BAUDRATE_FPCLK_DIV_64;   /* Set baud rate bits. */
-  reg32 |= SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE; /* Set CPOL value. */
-  reg32 |= SPI_CR1_CPHA_CLK_TRANSITION_2;   /* Set CPHA value. */
-  reg32 |= SPI_CR1_DFF_8BIT;                /* Set data format (8 or 16 bits). */
-  reg32 |= SPI_CR1_MSBFIRST;                /* Set frame format (LSB- or MSB-first). */
-  reg32 |= SPI_CR1_BIDIMODE;                /* Set Bidirectional data mode enable. */
-
-  SPI_CR2(SPI1) |= SPI_CR2_SSOE; /* common case */
-  SPI_CR1(SPI1) = reg32;
-
-  spi_disable_software_slave_management(SPI1);
-  spi_set_nss_high(SPI1);
-
-  spi_enable(SPI1);
+void exti3_isr(void) {
+  // TODO: llamar a la función correspondiente de encoders.h
+  exti_reset_request(EXTI3);
 }
+
+void exti15_10_isr(void) {
+  // TODO: llamar a la función correspondiente de encoders.h
+  exti_reset_request(EXTI15);
+}
+
+// static void setup_spi(void) {
+//   spi_reset(SPI1);
+//   // spi_disable_crc(SPI1);
+
+//   // spi_init_slave
+//   uint32_t reg32 = SPI_CR1(SPI1);
+
+//   /* Reset all bits omitting SPE, CRCEN and CRCNEXT bits. */
+//   reg32 &= SPI_CR1_SPE | SPI_CR1_CRCEN | SPI_CR1_CRCNEXT;
+
+//   reg32 |= (0 << 2); /* Configure SPI as slave. */
+
+//   reg32 |= SPI_CR1_BAUDRATE_FPCLK_DIV_64;   /* Set baud rate bits. */
+//   reg32 |= SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE; /* Set CPOL value. */
+//   reg32 |= SPI_CR1_CPHA_CLK_TRANSITION_2;   /* Set CPHA value. */
+//   reg32 |= SPI_CR1_DFF_8BIT;                /* Set data format (8 or 16 bits). */
+//   reg32 |= SPI_CR1_MSBFIRST;                /* Set frame format (LSB- or MSB-first). */
+//   reg32 |= SPI_CR1_BIDIMODE;                /* Set Bidirectional data mode enable. */
+
+//   SPI_CR2(SPI1) |= SPI_CR2_SSOE; /* common case */
+//   SPI_CR1(SPI1) = reg32;
+
+//   spi_disable_software_slave_management(SPI1);
+//   spi_set_nss_high(SPI1);
+
+//   spi_enable(SPI1);
+// }
 
 void setup(void) {
   setup_clock();
