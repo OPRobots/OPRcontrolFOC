@@ -7,6 +7,7 @@
 #define SYSTICK_FREQUENCY_HZ 1000
 #define MICROSECONDS_PER_SECOND 1000000
 #define PI 3.1415
+#define PWM_PERIOD 512
 
 
 #endif

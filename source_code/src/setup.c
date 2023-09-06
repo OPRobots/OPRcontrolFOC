@@ -60,7 +60,8 @@ static void setup_gpio(void) {
 
   // Salida PWM para los motores
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM2_CH1_ETR | GPIO_TIM2_CH2 | GPIO_TIM2_CH3 | GPIO_TIM1_CH1 | GPIO_TIM1_CH2 | GPIO_TIM1_CH3);
+                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
+                GPIO0 | GPIO1 | GPIO2 | GPIO8 | GPIO9 | GPIO10);
 
   // Entradas Encoders
   // gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4 | GPIO5 | GPIO6 | GPIO7);
@@ -78,7 +79,6 @@ static void setup_gpio(void) {
   // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6); // INPUT? OUTPUT 50MHZ?
 
   // USART2
-
   // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
   //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART2_TX);
   // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
@@ -156,6 +156,56 @@ void exti15_10_isr(void) {
   exti_reset_request(EXTI15);
 }
 
+static void setup_pwm(void) {
+  timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
+                 TIM_CR1_DIR_UP);
+
+  timer_set_prescaler(TIM1, 4);
+  timer_set_repetition_counter(TIM1, 0);
+  timer_enable_preload(TIM1);
+  timer_continuous_mode(TIM1);
+  timer_set_period(TIM1, PWM_PERIOD);
+
+  timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM1, TIM_OC2, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM1, TIM_OC3, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM1, TIM_OC4, TIM_OCM_PWM1);
+  timer_set_oc_value(TIM1, TIM_OC1, 0);
+  timer_set_oc_value(TIM1, TIM_OC2, 0);
+  timer_set_oc_value(TIM1, TIM_OC3, 0);
+  timer_enable_oc_output(TIM1, TIM_OC1);
+  timer_enable_oc_output(TIM1, TIM_OC2);
+  timer_enable_oc_output(TIM1, TIM_OC3);
+  timer_disable_oc_output(TIM1, TIM_OC4);
+  timer_enable_break_main_output(TIM1);
+
+  timer_enable_counter(TIM1);
+
+  timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
+                 TIM_CR1_DIR_UP);
+
+  timer_set_prescaler(TIM2, 4);
+  timer_set_repetition_counter(TIM2, 0);
+  timer_enable_preload(TIM2);
+  timer_continuous_mode(TIM2);
+  timer_set_period(TIM2, PWM_PERIOD);
+
+  timer_set_oc_mode(TIM2, TIM_OC1, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM2, TIM_OC2, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM2, TIM_OC3, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM2, TIM_OC4, TIM_OCM_PWM1);
+  timer_set_oc_value(TIM2, TIM_OC1, 0);
+  timer_set_oc_value(TIM2, TIM_OC2, 0);
+  timer_set_oc_value(TIM2, TIM_OC3, 0);
+  timer_enable_oc_output(TIM2, TIM_OC1);
+  timer_enable_oc_output(TIM2, TIM_OC2);
+  timer_enable_oc_output(TIM2, TIM_OC3);
+  timer_disable_oc_output(TIM2, TIM_OC4);
+  // timer_enable_break_main_output(TIM2);
+
+  timer_enable_counter(TIM2);
+}
+
 // static void setup_spi(void) {
 //   spi_reset(SPI1);
 //   // spi_disable_crc(SPI1);
@@ -188,6 +238,7 @@ void setup(void) {
   setup_clock();
   setup_gpio();
   setup_usart();
+  setup_pwm();
   setup_quadrature_encoders();
 
   setup_timer_priorities();
