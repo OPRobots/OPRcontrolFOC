@@ -147,13 +147,14 @@ static void setup_quadrature_encoders(void) {
 }
 
 void exti3_isr(void) {
-  // TODO: llamar a la función correspondiente de encoders.h
+  reset_encoder_right_total_ticks();
   exti_reset_request(EXTI3);
 }
 
 void exti15_10_isr(void) {
-  // TODO: llamar a la función correspondiente de encoders.h
+  reset_encoder_left_total_ticks();
   exti_reset_request(EXTI15);
+
 }
 
 static void setup_pwm(void) {

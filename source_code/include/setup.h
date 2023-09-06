@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "usart.h"
+#include "encoders.h"
 
 void setup(void);
 

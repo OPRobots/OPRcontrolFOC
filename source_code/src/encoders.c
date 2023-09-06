@@ -40,6 +40,32 @@ int32_t get_encoder_right_total_ticks(void) {
   return right_total_ticks;
 }
 
+int32_t get_encoder_left_absolute_position(void) {
+  if (left_total_ticks >= 0) {
+    return left_total_ticks;
+  } else {
+    return 4096 + left_total_ticks;
+  }
+}
+
+int32_t get_encoder_right_absolute_position(void) {
+  if (right_total_ticks >= 0) {
+    return right_total_ticks;
+  } else {
+    return 4096 + right_total_ticks;
+  }
+}
+
+void reset_encoder_left_total_ticks(void) {
+  left_total_ticks = 0;
+  left_diff_ticks = 0;
+}
+
+void reset_encoder_right_total_ticks(void) {
+  right_total_ticks = 0;
+  right_diff_ticks = 0;
+}
+
 /**
  * @brief Return the most likely counter difference.
  *

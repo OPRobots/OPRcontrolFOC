@@ -15,7 +15,7 @@ int main(void) {
   setup();
 
   while (1) {
-    printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_right_total_ticks());
+    printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_left_absolute_position());
     delay(100);
     // usart_send(USART2, "o");
     // usart_send(USART2, "\n");
