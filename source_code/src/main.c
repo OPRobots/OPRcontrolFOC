@@ -1,5 +1,6 @@
 #include "delay.h"
 #include "encoders.h"
+#include "motors.h"
 #include "setup.h"
 #include "spi.h"
 #include "usart.h"
@@ -9,14 +10,13 @@ void sys_tick_handler(void) {
   update_encoder_readings();
 }
 
-uint8_t command = 0;
-
 int main(void) {
   setup();
-
+  motors_init();
   while (1) {
-    printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_left_absolute_position());
-    delay(100);
+    // printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_left_absolute_position());
+    motors_move();
+    delay_us(1000);
     // usart_send(USART2, "o");
     // usart_send(USART2, "\n");
     // gpio_toggle(GPIOC, GPIO13);
