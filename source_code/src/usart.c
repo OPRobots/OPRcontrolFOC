@@ -27,44 +27,16 @@ int _write(int file, char *ptr, int len) {
 
 void manage_usart_command(char command, int value) {
   switch (command) {
-    case 'A':
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
+    case CMD_SPEED_LEFT:
+      motors_set_left_speed(value);
+      // printf("OK> %c: %d", command, value);
       break;
-    case 'B':
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
-      delay(value);
-      gpio_set(GPIOC, GPIO13);
-      delay(value);
-      gpio_clear(GPIOC, GPIO13);
+    case CMD_SPEED_RIGHT:
+      motors_set_right_speed(value);
+      // printf("OK> %c: %d", command, value);
       break;
     default:
-      gpio_toggle(GPIOC, GPIO13);
+      // printf("ERR> %c: %d", command, value);
       break;
   }
 }

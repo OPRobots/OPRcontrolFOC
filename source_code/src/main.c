@@ -13,10 +13,13 @@ void sys_tick_handler(void) {
 int main(void) {
   setup();
   motors_init();
+  // printf("%s\n", "PATO");
+  motors_set_left_speed(90);
+  motors_set_right_speed(-20);
   while (1) {
     // printf("%ld - %ld\n", get_encoder_left_total_ticks(), get_encoder_left_absolute_position());
     motors_move();
-    delay_us(1000);
+    // delay_us(1000);
     // usart_send(USART2, "o");
     // usart_send(USART2, "\n");
     // gpio_toggle(GPIOC, GPIO13);

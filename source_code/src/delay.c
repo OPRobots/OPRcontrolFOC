@@ -9,7 +9,7 @@ static volatile uint32_t clock_ticks;
 void clock_tick() { clock_ticks++; }
 
 /**
- * @brief Obtiene el contaor de ciclos de ejecución interno
+ * @brief Obtiene el contador de ciclos de ejecución interno
  * 
  * @return uint32_t 
  */
