@@ -11,5 +11,4 @@ enum COMMAND {
   CMD_MOTOR_SPEED_LEFT = 'L',
 };
 
-
 #endif
