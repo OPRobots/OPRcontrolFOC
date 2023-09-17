@@ -13,6 +13,7 @@ void sys_tick_handler(void) {
 int main(void) {
   setup();
   motors_init();
+  motors_disable();
   // printf("%s\n", "PATO");
   motors_set_left_speed(90);
   motors_set_right_speed(-20);

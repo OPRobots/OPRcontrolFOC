@@ -2,6 +2,7 @@
 
 static bool inited = false;
 static uint16_t sine_lookup[SINE_LOOKUP_SIZE];
+static uint8_t SINE_LOOKUP_STEP = 5;
 
 static uint32_t max_sine_update_us = 1500;
 static uint32_t min_sine_update_us = 250;
@@ -59,10 +60,30 @@ static bool motor_speed_can_update(int motor_speed_wait_us, uint32_t motor_last_
   return read_cycle_counter() > motor_last_update + (uint32_t)(SYSCLK_FREQUENCY_HZ * ((float)motor_speed_wait_us / (float)MICROSECONDS_PER_SECOND));
 }
 
+void motors_set_config_sine_lookup_step(int sine_step) {
+  SINE_LOOKUP_STEP = sine_step;
+}
+
+void motors_set_config_sine_update_max(int update_max) {
+  max_sine_update_us = update_max;
+}
+
+void motors_set_config_sine_update_min(int update_min) {
+  min_sine_update_us = update_min;
+}
+
 void motors_init(void) {
   fill_lookup();
   set_starting_index();
   inited = true;
+}
+
+void motors_disable(void) {
+  gpio_set(GPIOB, GPIO14 | GPIO15);
+}
+
+void motors_enable(void) {
+  gpio_clear(GPIOB, GPIO14 | GPIO15);
 }
 
 void motors_set_left_speed(int left_speed) {

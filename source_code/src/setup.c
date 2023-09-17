@@ -58,6 +58,9 @@ static void setup_gpio(void) {
   // Builtin LED
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
+  // Enable Motores
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO14 | GPIO15);
+
   // Salida PWM para los motores
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
                 GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
@@ -154,7 +157,6 @@ void exti3_isr(void) {
 void exti15_10_isr(void) {
   reset_encoder_left_total_ticks();
   exti_reset_request(EXTI15);
-
 }
 
 static void setup_pwm(void) {
