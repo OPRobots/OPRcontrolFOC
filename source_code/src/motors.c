@@ -73,17 +73,20 @@ void motors_set_config_sine_update_min(int update_min) {
 }
 
 void motors_init(void) {
-  fill_lookup();
-  set_starting_index();
-  inited = true;
+  if (!inited) {
+    fill_lookup();
+    motors_disable();
+    set_starting_index();
+    inited = true;
+  }
 }
 
 void motors_disable(void) {
-  gpio_set(GPIOB, GPIO14 | GPIO15);
+  gpio_clear(GPIOB, GPIO14 | GPIO15);
 }
 
 void motors_enable(void) {
-  gpio_clear(GPIOB, GPIO14 | GPIO15);
+  gpio_set(GPIOB, GPIO14 | GPIO15);
 }
 
 void motors_set_left_speed(int left_speed) {
