@@ -2,7 +2,6 @@
 #include "encoders.h"
 #include "motors.h"
 #include "setup.h"
-#include "spi.h"
 #include "usart.h"
 
 void sys_tick_handler(void) {

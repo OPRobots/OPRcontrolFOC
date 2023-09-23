@@ -17,7 +17,6 @@ static void setup_clock(void) {
   rcc_periph_clock_enable(RCC_GPIOC);
   rcc_periph_clock_enable(RCC_AFIO);
 
-  // rcc_periph_clock_enable(RCC_SPI1);
   // rcc_periph_clock_enable(RCC_USART2);
   rcc_periph_clock_enable(RCC_USART3);
 
@@ -41,15 +40,13 @@ static void setup_systick(void) {
 
 static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
-  nvic_set_priority(NVIC_SPI1_IRQ, 16 * 2);
   // nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
-  nvic_set_priority(NVIC_USART3_IRQ, 16 * 3);
-  nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 4);
-  nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 5);
+  nvic_set_priority(NVIC_USART3_IRQ, 16 * 2);
+  nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 3);
+  nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 4);
 
   // nvic_enable_irq(NVIC_USART2_IRQ);
   nvic_enable_irq(NVIC_USART3_IRQ);
-  // nvic_enable_irq(NVIC_SPI1_IRQ);
   nvic_enable_irq(NVIC_EXTI3_IRQ);
   nvic_enable_irq(NVIC_EXTI15_10_IRQ);
 }
@@ -76,17 +73,6 @@ static void setup_gpio(void) {
   // Index Encoders
   gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3);
   gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15);
-
-  /* SPI */
-  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO4 | GPIO5 | GPIO7);
-  // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6); // INPUT? OUTPUT 50MHZ?
-
-  // USART2
-  // gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-  //               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART2_TX);
-  // gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-  //               GPIO_USART2_RX);
-  // gpio_set(GPIOA, GPIO_USART2_RX);
 
   // USART3
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
@@ -209,34 +195,6 @@ static void setup_pwm(void) {
   timer_enable_counter(TIM2);
 }
 
-// static void setup_spi(void) {
-//   spi_reset(SPI1);
-//   // spi_disable_crc(SPI1);
-
-//   // spi_init_slave
-//   uint32_t reg32 = SPI_CR1(SPI1);
-
-//   /* Reset all bits omitting SPE, CRCEN and CRCNEXT bits. */
-//   reg32 &= SPI_CR1_SPE | SPI_CR1_CRCEN | SPI_CR1_CRCNEXT;
-
-//   reg32 |= (0 << 2); /* Configure SPI as slave. */
-
-//   reg32 |= SPI_CR1_BAUDRATE_FPCLK_DIV_64;   /* Set baud rate bits. */
-//   reg32 |= SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE; /* Set CPOL value. */
-//   reg32 |= SPI_CR1_CPHA_CLK_TRANSITION_2;   /* Set CPHA value. */
-//   reg32 |= SPI_CR1_DFF_8BIT;                /* Set data format (8 or 16 bits). */
-//   reg32 |= SPI_CR1_MSBFIRST;                /* Set frame format (LSB- or MSB-first). */
-//   reg32 |= SPI_CR1_BIDIMODE;                /* Set Bidirectional data mode enable. */
-
-//   SPI_CR2(SPI1) |= SPI_CR2_SSOE; /* common case */
-//   SPI_CR1(SPI1) = reg32;
-
-//   spi_disable_software_slave_management(SPI1);
-//   spi_set_nss_high(SPI1);
-
-//   spi_enable(SPI1);
-// }
-
 void setup(void) {
   setup_clock();
   setup_gpio();
@@ -245,6 +203,5 @@ void setup(void) {
   setup_quadrature_encoders();
 
   setup_timer_priorities();
-  // setup_spi();
   setup_systick();
 }
