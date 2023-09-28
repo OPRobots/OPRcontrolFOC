@@ -136,9 +136,9 @@ void motors_move(void) {
       // timer_set_oc_value(TIM1, TIM_OC1, sine_lookup[motor_left_A]);
       TIM_CCR1(TIM1) = sine_lookup[motor_left_A];
       // timer_set_oc_value(TIM1, TIM_OC2, sine_lookup[motor_left_B]);
-      TIM_CCR2(TIM1) = sine_lookup[motor_left_B];
+      TIM_CCR2(TIM1) = sine_lookup[motor_left_C];
       // timer_set_oc_value(TIM1, TIM_OC3, sine_lookup[motor_left_C]);
-      TIM_CCR3(TIM1) = sine_lookup[motor_left_C];
+      TIM_CCR3(TIM1) = sine_lookup[motor_left_B];
 
       motor_left_last_update = read_cycle_counter();
       // printf("%d %d %d\n", sine_lookup[motor_left_A], sine_lookup[motor_left_B], sine_lookup[motor_left_C]);
@@ -179,9 +179,9 @@ void motors_move(void) {
       // timer_set_oc_value(TIM2, TIM_OC1, sine_lookup[motor_right_A]);
       TIM_CCR1(TIM2) = sine_lookup[motor_right_A];
       // timer_set_oc_value(TIM2, TIM_OC2, sine_lookup[motor_right_B]);
-      TIM_CCR2(TIM2) = sine_lookup[motor_right_B];
+      TIM_CCR2(TIM2) = sine_lookup[motor_right_C];
       // timer_set_oc_value(TIM2, TIM_OC3, sine_lookup[motor_right_C]);
-      TIM_CCR3(TIM2) = sine_lookup[motor_right_C];
+      TIM_CCR3(TIM2) = sine_lookup[motor_right_B];
 
       motor_right_last_update = read_cycle_counter();
       // printf("%d %d %d\n", sine_lookup[motor_right_A], sine_lookup[motor_right_B], sine_lookup[motor_right_C]);
