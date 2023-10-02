@@ -57,6 +57,9 @@ static void set_starting_index(void) {
 }
 
 static bool motor_speed_can_update(int motor_speed_wait_us, uint32_t motor_last_update) {
+  if (read_cycle_counter() < motor_last_update) {
+    motor_last_update = 0;
+  }
   return read_cycle_counter() > motor_last_update + (uint32_t)(SYSCLK_FREQUENCY_HZ * ((float)motor_speed_wait_us / (float)MICROSECONDS_PER_SECOND));
 }
 
