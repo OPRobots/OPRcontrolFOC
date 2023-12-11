@@ -119,6 +119,18 @@ void update_encoder_readings(void) {
   left_total_ticks += left_diff_ticks;
   right_total_ticks += right_diff_ticks;
 
+  if (left_total_ticks > 4095) {
+    left_total_ticks = left_total_ticks - 4095;
+  } else if (left_total_ticks < 0) {
+    left_total_ticks = 4095 + left_total_ticks;
+  }
+
+  if (right_total_ticks > 4095) {
+    right_total_ticks = right_total_ticks - 4095;
+  } else if (right_total_ticks < 0) {
+    right_total_ticks = 4095 + right_total_ticks;
+  }
+
   last_left_ticks = left_ticks;
   last_right_ticks = right_ticks;
 }

@@ -42,8 +42,8 @@ static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
   // nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
   nvic_set_priority(NVIC_USART3_IRQ, 16 * 2);
-  nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 3);
-  nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 4);
+  // nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 3);
+  // nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 4);
 
   // nvic_enable_irq(NVIC_USART2_IRQ);
   nvic_enable_irq(NVIC_USART3_IRQ);
@@ -53,7 +53,7 @@ static void setup_timer_priorities(void) {
 
 static void setup_gpio(void) {
   // Builtin LED
-  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13| GPIO14);
 
   // Enable Motores
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO14 | GPIO15);
@@ -136,12 +136,14 @@ static void setup_quadrature_encoders(void) {
 }
 
 void exti3_isr(void) {
-  reset_encoder_right_total_ticks();
+  // gpio_clear(GPIOC, GPIO13);
+  // reset_encoder_right_total_ticks();
   exti_reset_request(EXTI3);
 }
 
 void exti15_10_isr(void) {
-  reset_encoder_left_total_ticks();
+  // gpio_toggle(GPIOC, GPIO14);
+  // reset_encoder_left_total_ticks();
   exti_reset_request(EXTI15);
 }
 
