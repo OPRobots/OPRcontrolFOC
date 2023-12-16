@@ -6,6 +6,7 @@
 #include <libopencm3/stm32/timer.h>
 
 #include "config.h"
+#include "motors.h"
 #include "setup.h"
 
 int32_t get_encoder_left_total_ticks(void);

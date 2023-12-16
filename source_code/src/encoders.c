@@ -42,28 +42,30 @@ int32_t get_encoder_right_total_ticks(void) {
 
 int32_t get_encoder_left_absolute_position(void) {
   if (left_total_ticks >= 0) {
-    return left_total_ticks;
+    return left_total_ticks % 586;
   } else {
-    return 4096 + left_total_ticks;
+    return (4096 + left_total_ticks) % 586;
   }
 }
 
 int32_t get_encoder_right_absolute_position(void) {
   if (right_total_ticks >= 0) {
-    return right_total_ticks;
+    return right_total_ticks % 586;
   } else {
-    return 4096 + right_total_ticks;
+    return (4096 + right_total_ticks) % 586;
   }
 }
 
 void reset_encoder_left_total_ticks(void) {
   left_total_ticks = 0;
   left_diff_ticks = 0;
+  set_motor_left_inited();
 }
 
 void reset_encoder_right_total_ticks(void) {
   right_total_ticks = 0;
   right_diff_ticks = 0;
+  set_motor_right_inited();
 }
 
 /**
@@ -119,17 +121,17 @@ void update_encoder_readings(void) {
   left_total_ticks += left_diff_ticks;
   right_total_ticks += right_diff_ticks;
 
-  if (left_total_ticks > 4095) {
-    left_total_ticks = left_total_ticks - 4095;
-  } else if (left_total_ticks < 0) {
-    left_total_ticks = 4095 + left_total_ticks;
-  }
+  // if (left_total_ticks > 585) {
+  //   left_total_ticks = left_total_ticks - 585;
+  // } else if (left_total_ticks < 0) {
+  //   left_total_ticks = 585 + left_total_ticks;
+  // }
 
-  if (right_total_ticks > 4095) {
-    right_total_ticks = right_total_ticks - 4095;
-  } else if (right_total_ticks < 0) {
-    right_total_ticks = 4095 + right_total_ticks;
-  }
+  // if (right_total_ticks > 585) {
+  //   right_total_ticks = right_total_ticks - 585;
+  // } else if (right_total_ticks < 0) {
+  //   right_total_ticks = 585 + right_total_ticks;
+  // }
 
   last_left_ticks = left_ticks;
   last_right_ticks = right_ticks;

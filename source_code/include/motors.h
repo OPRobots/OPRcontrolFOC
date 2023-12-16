@@ -1,28 +1,30 @@
 #ifndef __MOTORS_H
 #define __MOTORS_H
 
-#include <stdint.h>
-#include <math.h>
 #include <fastmath.h>
+#include <math.h>
+#include <stdint.h>
 
-#include "setup.h"
 #include "config.h"
 #include "delay.h"
-#include "utils.h"
+#include "encoders.h"
+#include "setup.h"
 #include "usart.h"
+#include "utils.h"
 
-#define SINE_LOOKUP_SIZE 300
+#define SINE_LOOKUP_SIZE 360
 
-void motors_set_config_sine_lookup_step(int sine_step);
-void motors_set_config_sine_update_max(int update_max);
-void motors_set_config_sine_update_min(int update_min);
 
 void motors_init(void);
 void motors_disable(void);
 void motors_enable(void);
 void motors_move(void);
 
+void set_motor_left_inited(void);
+void set_motor_right_inited(void);
+
 void motors_set_left_speed(int left_speed);
 void motors_set_right_speed(int right_speed);
+
 
 #endif
