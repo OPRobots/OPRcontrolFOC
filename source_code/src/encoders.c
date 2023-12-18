@@ -8,6 +8,17 @@ static volatile int32_t right_diff_ticks;
 static volatile int32_t left_total_ticks;
 static volatile int32_t right_total_ticks;
 
+/* Speed, in rpm */
+static volatile int16_t left_speed;
+static volatile int16_t left_speed_raw;
+static volatile int32_t left_speed_smooth_int;
+static volatile int32_t left_speed_smooth_fp;
+
+static volatile int16_t right_speed;
+static volatile int16_t right_speed_raw;
+static volatile int32_t right_speed_smooth_int;
+static volatile int32_t right_speed_smooth_fp;
+
 /**
  * @brief Read left motor encoder counter.
  */
@@ -69,6 +80,32 @@ void reset_encoder_right_total_ticks(void) {
 }
 
 /**
+ * @brief Read left motor speed in meters per second.
+ */
+int32_t get_encoder_left_raw_speed(void) {
+  return left_speed_raw;
+}
+/**
+ * @brief Read left motor speed in meters per second.
+ */
+int32_t get_encoder_left_speed(void) {
+  return left_speed_smooth_int;
+}
+
+/**
+ * @brief Read right motor speed in meters per second.
+ */
+int32_t get_encoder_right_raw_speed(void) {
+  return right_speed_raw;
+}
+/**
+ * @brief Read right motor speed in meters per second.
+ */
+int32_t get_encoder_right_speed(void) {
+  return right_speed_smooth_int;
+}
+
+/**
  * @brief Return the most likely counter difference.
  *
  * When reading an increasing or decreasing counter caution must be taken to:
@@ -121,17 +158,21 @@ void update_encoder_readings(void) {
   left_total_ticks += left_diff_ticks;
   right_total_ticks += right_diff_ticks;
 
-  // if (left_total_ticks > 585) {
-  //   left_total_ticks = left_total_ticks - 585;
-  // } else if (left_total_ticks < 0) {
-  //   left_total_ticks = 585 + left_total_ticks;
-  // }
+  left_speed = (left_diff_ticks * SYSTICK_FREQUENCY_HZ * 60.0) / 4096;
+  left_speed_raw = left_speed;
+  left_speed <<= 3; // Shift to fixed point
+  left_speed_smooth_fp = (left_speed_smooth_fp << SPEED_SMOOTHING_FACTOR) - left_speed_smooth_fp;
+  left_speed_smooth_fp += left_speed;
+  left_speed_smooth_fp >>= SPEED_SMOOTHING_FACTOR;
+  left_speed_smooth_int = left_speed_smooth_fp >> 3;
 
-  // if (right_total_ticks > 585) {
-  //   right_total_ticks = right_total_ticks - 585;
-  // } else if (right_total_ticks < 0) {
-  //   right_total_ticks = 585 + right_total_ticks;
-  // }
+  right_speed = (right_diff_ticks * SYSTICK_FREQUENCY_HZ * 60.0) / 4096;
+  right_speed_raw = right_speed;
+  right_speed <<= 3; // Shift to fixed point
+  right_speed_smooth_fp = (right_speed_smooth_fp << SPEED_SMOOTHING_FACTOR) - right_speed_smooth_fp;
+  right_speed_smooth_fp += right_speed;
+  right_speed_smooth_fp >>= SPEED_SMOOTHING_FACTOR;
+  right_speed_smooth_int = right_speed_smooth_fp >> 3;
 
   last_left_ticks = left_ticks;
   last_right_ticks = right_ticks;

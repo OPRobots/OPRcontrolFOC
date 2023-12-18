@@ -23,9 +23,9 @@ uint32_t read_cycle_counter() {
  * @param ms Tiempo en ms de la pausa
  */
 void delay(uint32_t ms) {
-  uint32_t awake = clock_ticks + ms;
+  uint32_t awake = clock_ticks/10 + ms;
 
-  while (awake > clock_ticks)
+  while (awake > clock_ticks/10)
     ;
 }
 
@@ -35,7 +35,7 @@ void delay(uint32_t ms) {
  * @return uint32_t 
  */
 uint32_t get_clock_ticks(void) {
-  return clock_ticks;
+  return clock_ticks/10;
 }
 
 /**

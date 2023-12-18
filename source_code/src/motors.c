@@ -7,17 +7,17 @@ static uint16_t motor_left_init_index = 0;
 static uint16_t motor_left_offset = 0;
 static int motor_left_speed = 0;
 static bool motor_left_inited = false;
-static volatile uint16_t motor_left_A;
-static volatile uint16_t motor_left_B;
-static volatile uint16_t motor_left_C;
+static volatile int16_t motor_left_A;
+static volatile int16_t motor_left_B;
+static volatile int16_t motor_left_C;
 
 static uint16_t motor_right_init_index = 0;
 static uint16_t motor_right_offset = 0;
 static int motor_right_speed = 0;
 static int motor_right_inited = false;
-static volatile uint16_t motor_right_A;
-static volatile uint16_t motor_right_B;
-static volatile uint16_t motor_right_C;
+static volatile int16_t motor_right_A;
+static volatile int16_t motor_right_B;
+static volatile int16_t motor_right_C;
 
 static void fill_lookup(void) {
   float value = 0;
@@ -125,8 +125,8 @@ static void init_absolute_position(void) {
   // motor_left_offset %= 90;
   // motor_right_offset %= 90;
   // printf("Offsets - L:%d R:%d\n", motor_left_offset, motor_right_offset);
-  motor_left_offset = 66;
-  motor_right_offset = 17;
+  motor_left_offset = 50;
+  motor_right_offset = 350;
 
   motors_disable();
 }
@@ -169,22 +169,14 @@ void motors_move(void) {
   if (inited) {
     if (motor_left_speed != 0) {
       if (motor_left_speed > 0) {
-        motor_left_A = map(get_encoder_left_absolute_position(), 0, 585, 0, 360) + motor_left_offset +270;/* + (180 + map(abs(motor_right_speed), 0, 100, 0, 90)); */
+        motor_left_A = map(get_encoder_left_absolute_position(), 0, 585, 0, 360) + motor_left_offset + 270; /* + (180 + map(abs(motor_right_speed), 0, 100, 0, 90)); */
       } else {
-        motor_left_A = map(get_encoder_left_absolute_position(), 0, 585, 0, 360) + motor_left_offset +90;/*+  map(motor_right_speed, 0, 100, 0, 90); */
+        motor_left_A = map(get_encoder_left_absolute_position(), 0, 585, 0, 360) + motor_left_offset + 90; /*+  map(motor_right_speed, 0, 100, 0, 90); */
       }
 
-      if (motor_left_A >= SINE_LOOKUP_SIZE) {
-        motor_left_A = motor_left_A - SINE_LOOKUP_SIZE;
-      }
-      motor_left_B = motor_left_A + (SINE_LOOKUP_SIZE / 3);
-      if (motor_left_B >= SINE_LOOKUP_SIZE) {
-        motor_left_B = motor_left_B - SINE_LOOKUP_SIZE;
-      }
-      motor_left_C = motor_left_B + (SINE_LOOKUP_SIZE / 3);
-      if (motor_left_C >= SINE_LOOKUP_SIZE) {
-        motor_left_C = motor_left_C - SINE_LOOKUP_SIZE;
-      }
+      motor_left_A = motor_left_A % 360;
+      motor_left_B = (motor_left_A + (SINE_LOOKUP_SIZE / 3)) % 360;
+      motor_left_C = (motor_left_B + (SINE_LOOKUP_SIZE / 3)) % 360;
 
       TIM_CCR1(TIM2) = sine_lookup[motor_left_C] * (abs(motor_left_speed) / 100.0f);
       TIM_CCR2(TIM2) = sine_lookup[motor_left_B] * (abs(motor_left_speed) / 100.0f);
@@ -195,22 +187,14 @@ void motors_move(void) {
 
     if (motor_right_speed != 0) {
       if (motor_right_speed > 0) {
-        motor_right_A = map(get_encoder_right_absolute_position(), 0, 585, 0, 360) + motor_right_offset +90;/* + map(motor_right_speed, 0, 100, 0, 90); */
+        motor_right_A = map(get_encoder_right_absolute_position(), 0, 585, 0, 360) + motor_right_offset + 90; /* + map(motor_right_speed, 0, 100, 0, 90); */
       } else {
-        motor_right_A = map(get_encoder_right_absolute_position(), 0, 585, 0, 360) + motor_right_offset +270;/* + (180 + map(abs(motor_right_speed), 0, 100, 0, 90)); */
+        motor_right_A = map(get_encoder_right_absolute_position(), 0, 585, 0, 360) + motor_right_offset + 270; /* + (180 + map(abs(motor_right_speed), 0, 100, 0, 90)); */
       }
 
-      if (motor_right_A >= SINE_LOOKUP_SIZE) {
-        motor_right_A = motor_right_A - SINE_LOOKUP_SIZE;
-      }
-      motor_right_B = motor_right_A + (SINE_LOOKUP_SIZE / 3);
-      if (motor_right_B >= SINE_LOOKUP_SIZE) {
-        motor_right_B = motor_right_B - SINE_LOOKUP_SIZE;
-      }
-      motor_right_C = motor_right_B + (SINE_LOOKUP_SIZE / 3);
-      if (motor_right_C >= SINE_LOOKUP_SIZE) {
-        motor_right_C = motor_right_C - SINE_LOOKUP_SIZE;
-      }
+      motor_right_A = motor_right_A % 360;
+      motor_right_B = (motor_right_A + (SINE_LOOKUP_SIZE / 3)) % 360;
+      motor_right_C = (motor_right_B + (SINE_LOOKUP_SIZE / 3)) % 360;
 
       TIM_CCR1(TIM1) = sine_lookup[motor_right_A] * (abs(motor_right_speed) / 100.0f);
       TIM_CCR2(TIM1) = sine_lookup[motor_right_B] * (abs(motor_right_speed) / 100.0f);
