@@ -42,8 +42,8 @@ static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
   // nvic_set_priority(NVIC_USART2_IRQ, 16 * 3);
   nvic_set_priority(NVIC_USART3_IRQ, 16 * 2);
-  nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 3);
-  nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 4);
+  // nvic_set_priority(NVIC_EXTI3_IRQ, 16 * 3);
+  // nvic_set_priority(NVIC_EXTI15_10_IRQ, 16 * 4);
 
   // nvic_enable_irq(NVIC_USART2_IRQ);
   nvic_enable_irq(NVIC_USART3_IRQ);
@@ -53,7 +53,7 @@ static void setup_timer_priorities(void) {
 
 static void setup_gpio(void) {
   // Builtin LED
-  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13 | GPIO14);
 
   // Enable Motores
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO14 | GPIO15);
@@ -120,9 +120,9 @@ static void setup_quadrature_encoders(void) {
   timer_ic_set_input(TIM4, TIM_IC2, TIM_IC_IN_TI2);
   timer_enable_counter(TIM4);
 
-  exti_select_source(EXTI3, GPIOB);
-  exti_set_trigger(EXTI3, EXTI_TRIGGER_FALLING);
-  exti_enable_request(EXTI3);
+  exti_select_source(EXTI15, GPIOA);
+  exti_set_trigger(EXTI15, EXTI_TRIGGER_FALLING);
+  exti_enable_request(EXTI15);
 
   timer_set_period(TIM3, 0xFFFF);
   timer_slave_set_mode(TIM3, TIM_SMCR_SMS_EM3);
@@ -130,19 +130,19 @@ static void setup_quadrature_encoders(void) {
   timer_ic_set_input(TIM3, TIM_IC2, TIM_IC_IN_TI2);
   timer_enable_counter(TIM3);
 
-  exti_select_source(EXTI15, GPIOA);
-  exti_set_trigger(EXTI15, EXTI_TRIGGER_FALLING);
-  exti_enable_request(EXTI15);
-}
-
-void exti3_isr(void) {
-  reset_encoder_right_total_ticks();
-  exti_reset_request(EXTI3);
+  exti_select_source(EXTI3, GPIOB);
+  exti_set_trigger(EXTI3, EXTI_TRIGGER_RISING);
+  exti_enable_request(EXTI3);
 }
 
 void exti15_10_isr(void) {
-  reset_encoder_left_total_ticks();
+  reset_encoder_right_total_ticks();
   exti_reset_request(EXTI15);
+}
+
+void exti3_isr(void) {
+  reset_encoder_left_total_ticks();
+  exti_reset_request(EXTI3);
 }
 
 static void setup_pwm(void) {

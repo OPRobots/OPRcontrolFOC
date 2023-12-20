@@ -3,15 +3,6 @@
 void manage_command(char command, int value) {
   // printf("OK> %c: %d", command, value);
   switch (command) {
-    case CMD_CONFIG_SINE_STEP:
-      motors_set_config_sine_lookup_step(value);
-      break;
-    case CMD_CONFIG_SINE_UPDATE_MAX:
-      motors_set_config_sine_update_max(value);
-      break;
-    case CMD_CONFIG_SINE_UPDATE_MIN:
-      motors_set_config_sine_update_min(value);
-      break;
     case CMD_MOTOR_SPEED_LEFT:
       motors_set_left_speed(value);
       break;

@@ -4,14 +4,14 @@ static volatile uint32_t clock_ticks;
 
 /**
  * @brief Aumenta el contador de pulsos del reloj
- * 
+ *
  */
 void clock_tick() { clock_ticks++; }
 
 /**
  * @brief Obtiene el contador de ciclos de ejecución interno
- * 
- * @return uint32_t 
+ *
+ * @return uint32_t
  */
 uint32_t read_cycle_counter() {
   return dwt_read_cycle_counter();
@@ -19,28 +19,28 @@ uint32_t read_cycle_counter() {
 
 /**
  * @brief Realiza una pausa en el programa
- * 
+ *
  * @param ms Tiempo en ms de la pausa
  */
 void delay(uint32_t ms) {
-  uint32_t awake = clock_ticks + ms;
+  uint32_t awake = (clock_ticks * 1000 / SYSTICK_FREQUENCY_HZ) + ms;
 
-  while (awake > clock_ticks)
+  while (awake > (clock_ticks * 1000 / SYSTICK_FREQUENCY_HZ))
     ;
 }
 
 /**
  * @brief Obtiene el número de pulsos de la ejecución
- * 
- * @return uint32_t 
+ *
+ * @return uint32_t
  */
 uint32_t get_clock_ticks(void) {
-  return clock_ticks;
+  return (clock_ticks * 1000 / SYSTICK_FREQUENCY_HZ);
 }
 
 /**
  * @brief Realiza una pausa en el programa
- * 
+ *
  * @param us Tiempo en us de la pausa
  */
 void delay_us(uint32_t us) {
