@@ -53,17 +53,17 @@ int32_t get_encoder_right_total_ticks(void) {
 
 int32_t get_encoder_left_absolute_position(void) {
   if (left_total_ticks >= 0) {
-    return left_total_ticks % 586;
+    return left_total_ticks % (MAX_ABSOLUTE_POSITION + 1);
   } else {
-    return (4096 + left_total_ticks) % 586;
+    return (4096 + left_total_ticks) % (MAX_ABSOLUTE_POSITION + 1);
   }
 }
 
 int32_t get_encoder_right_absolute_position(void) {
   if (right_total_ticks >= 0) {
-    return right_total_ticks % 586;
+    return right_total_ticks % (MAX_ABSOLUTE_POSITION + 1);
   } else {
-    return (4096 + right_total_ticks) % 586;
+    return (4096 + right_total_ticks) % (MAX_ABSOLUTE_POSITION + 1);
   }
 }
 

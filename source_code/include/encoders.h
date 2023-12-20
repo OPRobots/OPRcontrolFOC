@@ -11,6 +11,8 @@
 
 #define SPEED_SMOOTHING_FACTOR 4
 
+#define MAX_ABSOLUTE_POSITION 585
+
 int32_t get_encoder_left_total_ticks(void);
 int32_t get_encoder_right_total_ticks(void);
 
