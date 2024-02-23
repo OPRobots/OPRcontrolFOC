@@ -5,7 +5,7 @@ static uint16_t sine_lookup[SINE_LOOKUP_SIZE];
 
 static uint16_t motor_left_init_index = 0;
 static uint16_t motor_left_offset = 0;
-static int motor_left_speed = 0;
+static volatile int motor_left_speed = 0;
 static int16_t motor_left_speed_factor = 0;
 static int16_t motor_left_last_error = 0;
 static int16_t motor_left_sum_error = 0;
@@ -16,7 +16,7 @@ static volatile int16_t motor_left_C;
 
 static uint16_t motor_right_init_index = 0;
 static uint16_t motor_right_offset = 0;
-static int motor_right_speed = 0;
+static volatile int motor_right_speed = 0;
 static int16_t motor_right_speed_factor = 0;
 static int16_t motor_right_last_error = 0;
 static int16_t motor_right_sum_error = 0;
@@ -145,6 +145,11 @@ static void motors_pid(void) {
       (motor_left_sum_error * MOTOR_SPEED_KI);
 
   motor_left_speed_factor = constrain(motor_left_speed_factor, 0, 100);
+  if(motor_left_speed_factor > 95){
+      gpio_set(GPIOC, GPIO14);
+  }else{
+      gpio_clear(GPIOC, GPIO14);
+  }
 
   if (motor_left_speed_factor < 100 || left_error < 0) {
     motor_left_sum_error += left_error;
@@ -162,6 +167,11 @@ static void motors_pid(void) {
       (motor_right_sum_error * MOTOR_SPEED_KI);
 
   motor_right_speed_factor = constrain(motor_right_speed_factor, 0, 100);
+  if(motor_right_speed_factor > 95){
+      gpio_set(GPIOC, GPIO13);
+  }else{
+      gpio_clear(GPIOC, GPIO13);
+  }
 
   if (motor_right_speed_factor < 100 || right_error < 0) {
     motor_right_sum_error += right_error;
