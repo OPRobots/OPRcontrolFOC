@@ -145,10 +145,10 @@ static void motors_pid(void) {
       (motor_left_sum_error * MOTOR_SPEED_KI);
 
   motor_left_speed_factor = constrain(motor_left_speed_factor, 0, 100);
-  if(motor_left_speed_factor > 95){
-      gpio_set(GPIOC, GPIO14);
-  }else{
-      gpio_clear(GPIOC, GPIO14);
+  if (motor_left_speed_factor > 95) {
+    gpio_set(GPIOC, GPIO14);
+  } else {
+    gpio_clear(GPIOC, GPIO14);
   }
 
   if (motor_left_speed_factor < 100 || left_error < 0) {
@@ -159,7 +159,6 @@ static void motors_pid(void) {
   }
   motor_left_last_error = left_error;
 
-
   int16_t right_error = abs(motor_right_speed) - constrain(map(abs(get_encoder_right_speed()), 0, MOTOR_MAX_RPM, 0, 100), 0, 100);
   motor_right_speed_factor =
       (right_error * MOTOR_SPEED_KP) +
@@ -167,10 +166,10 @@ static void motors_pid(void) {
       (motor_right_sum_error * MOTOR_SPEED_KI);
 
   motor_right_speed_factor = constrain(motor_right_speed_factor, 0, 100);
-  if(motor_right_speed_factor > 95){
-      gpio_set(GPIOC, GPIO13);
-  }else{
-      gpio_clear(GPIOC, GPIO13);
+  if (motor_right_speed_factor > 95) {
+    gpio_set(GPIOC, GPIO13);
+  } else {
+    gpio_clear(GPIOC, GPIO13);
   }
 
   if (motor_right_speed_factor < 100 || right_error < 0) {
@@ -238,22 +237,22 @@ void motors_move(void) {
       motor_left_B = (motor_left_A + (SINE_LOOKUP_SIZE / 3)) % 360;
       motor_left_C = (motor_left_B + (SINE_LOOKUP_SIZE / 3)) % 360;
 
-      TIM_CCR1(TIM2) = sine_lookup[motor_left_C] * (abs(motor_left_speed_factor) / 100.0f);
-      TIM_CCR2(TIM2) = sine_lookup[motor_left_B] * (abs(motor_left_speed_factor) / 100.0f);
-      TIM_CCR3(TIM2) = sine_lookup[motor_left_A] * (abs(motor_left_speed_factor) / 100.0f);
+      TIM_CCR1(TIM2) = sine_lookup[motor_left_A] * (abs(motor_left_speed_factor) / 100.0f);
+      TIM_CCR2(TIM2) = sine_lookup[motor_left_C] * (abs(motor_left_speed_factor) / 100.0f);
+      TIM_CCR3(TIM2) = sine_lookup[motor_left_B] * (abs(motor_left_speed_factor) / 100.0f);
 
       // printf("%d %d %d\n", sine_lookup[motor_left_A], sine_lookup[motor_left_B], sine_lookup[motor_left_C]);
     } else {
-      TIM_CCR1(TIM2) = sine_lookup[motor_left_C];
-      TIM_CCR2(TIM2) = sine_lookup[motor_left_B];
-      TIM_CCR3(TIM2) = sine_lookup[motor_left_A];
+      TIM_CCR1(TIM2) = sine_lookup[motor_left_A];
+      TIM_CCR2(TIM2) = sine_lookup[motor_left_C];
+      TIM_CCR3(TIM2) = sine_lookup[motor_left_B];
     }
 
     if (motor_right_speed != 0) {
       if (motor_right_speed > 0) {
-        motor_right_A = map(get_encoder_right_absolute_position(), 0, MAX_ABSOLUTE_POSITION, 0, 360) + motor_right_offset + 90;
-      } else {
         motor_right_A = map(get_encoder_right_absolute_position(), 0, MAX_ABSOLUTE_POSITION, 0, 360) + motor_right_offset + 270;
+      } else {
+        motor_right_A = map(get_encoder_right_absolute_position(), 0, MAX_ABSOLUTE_POSITION, 0, 360) + motor_right_offset + 90;
       }
 
       motor_right_A = motor_right_A % 360;
