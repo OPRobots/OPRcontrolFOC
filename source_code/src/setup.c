@@ -89,7 +89,7 @@ static void setup_usart(void) {
   usart_set_parity(USART3, USART_PARITY_NONE);
   usart_set_flow_control(USART3, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART3, USART_MODE_TX_RX);
-  USART_CR1(USART3) |= USART_CR1_RXNEIE;
+  // USART_CR1(USART3) |= USART_CR1_RXNEIE;
   usart_enable(USART3);
 }
 
@@ -121,7 +121,7 @@ static void setup_quadrature_encoders(void) {
   timer_enable_counter(TIM4);
 
   exti_select_source(EXTI15, GPIOA);
-  exti_set_trigger(EXTI15, EXTI_TRIGGER_FALLING);
+  exti_set_trigger(EXTI15, EXTI_TRIGGER_RISING);
   exti_enable_request(EXTI15);
 
   timer_set_period(TIM3, 0xFFFF);
@@ -190,7 +190,7 @@ static void setup_pwm(void) {
   timer_enable_oc_output(TIM2, TIM_OC2);
   timer_enable_oc_output(TIM2, TIM_OC3);
   timer_disable_oc_output(TIM2, TIM_OC4);
-  // timer_enable_break_main_output(TIM2);
+  timer_enable_break_main_output(TIM2);
 
   timer_enable_counter(TIM2);
 }

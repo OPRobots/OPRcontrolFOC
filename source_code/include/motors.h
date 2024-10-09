@@ -34,4 +34,6 @@ int16_t motor_right_get_speed_factor(void);
 void motors_set_left_speed(int left_speed);
 void motors_set_right_speed(int right_speed);
 
+void debug_motors_move_open_loop(void);
+
 #endif
