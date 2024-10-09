@@ -89,7 +89,7 @@ static void setup_usart(void) {
   usart_set_parity(USART3, USART_PARITY_NONE);
   usart_set_flow_control(USART3, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART3, USART_MODE_TX_RX);
-  // USART_CR1(USART3) |= USART_CR1_RXNEIE;
+  USART_CR1(USART3) |= USART_CR1_RXNEIE;
   usart_enable(USART3);
 }
 
