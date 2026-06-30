@@ -1,0 +1,75 @@
+site_name: OPRcontrolFOC
+site_description: Documentación técnica — Placa de control FOC para motores brushless
+site_author: robotaleh
+site_url: https://docs.oprobots.org/boards/OPRcontrolFOC
+repo_name: OPRobots/OPRcontrolFOC
+
+theme:
+  name: material
+  custom_dir: docs/assets/templates
+  language: es
+  font:
+    text: Roboto
+    code: Roboto Mono
+  palette:
+    - scheme: default
+      primary: white
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Modo oscuro
+    - scheme: slate
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+  features:
+    - navigation.instant
+    - navigation.top
+    - toc.follow
+    - search.highlight
+    - content.code.copy
+  logo: assets/imgs/opr_logo.png
+  favicon: assets/imgs/favicon/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.fence_generic_format
+
+extra_javascript:
+  - assets/js/mermaid-zoom.js
+  - https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js
+  - assets/js/math-render.js
+
+extra_css:
+  - assets/css/custom.css
+  - assets/css/mermaid-zoom.css
+  - https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css
+
+exclude_docs: |
+  README.md
+
+validation:
+  links:
+    not_found: ignore
+
+nav:
+  - Inicio: index.md
+  - Hardware: 01-hardware.md
+  - Arquitectura Software: 02-software-architecture.md
+  - Comunicaciones: 03-communications.md
+  - Movimiento: 04-movement.md
+  - Control PID: 05-control-system.md
+  - Encoders: 06-encoders-gyro.md
+  - Debug: 07-debug-system.md
+  - Problemas Conocidos: 08-known-issues.md
