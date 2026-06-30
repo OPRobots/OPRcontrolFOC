@@ -39,7 +39,7 @@ static uint16_t read_encoder_right(void) {
  * The total count is simply the sum of all encoder counter differences.
  */
 int32_t get_encoder_left_total_ticks(void) {
-  return left_total_ticks+22;
+  return left_total_ticks;
 }
 
 /**
@@ -48,7 +48,7 @@ int32_t get_encoder_left_total_ticks(void) {
  * The total count is simply the sum of all encoder counter differences.
  */
 int32_t get_encoder_right_total_ticks(void) {
-  return right_total_ticks-61;
+  return right_total_ticks;
 }
 
 int32_t get_encoder_left_absolute_position(void) {
@@ -68,13 +68,13 @@ int32_t get_encoder_right_absolute_position(void) {
 }
 
 void reset_encoder_left_total_ticks(void) {
-  left_total_ticks = 0;
+  left_total_ticks = 22;
   left_diff_ticks = 0;
   set_motor_left_inited();
 }
 
 void reset_encoder_right_total_ticks(void) {
-  right_total_ticks = 0;
+  right_total_ticks = -61;
   right_diff_ticks = 0;
   set_motor_right_inited();
 }
